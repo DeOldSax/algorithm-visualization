@@ -27,6 +27,7 @@ body {
     background-color: #EBF5FF;
     padding: 20px;
     box-shadow: inset 0px 0px 9px rgba(0, 0, 0, 0.2);
+    overflow: auto;
 }
 
 .bar {
@@ -53,4 +54,19 @@ body {
     background-color: #00CC99;
     color: white;
     box-shadow: 0px 0px 5px #00CC99
+}
+
+#barContainer {
+  position: relative;
+  display: table;
+  margin: 0 auto;
+}
+
+#barContainerTop {
+  position: absolute;
+}
+
+#barContainerTopRight {
+  position: absolute;
+  right: 0;
 }
