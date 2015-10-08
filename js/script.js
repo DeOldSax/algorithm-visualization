@@ -72,6 +72,8 @@ function visualizeMergeSort(a, delayTime) {
 function MergeSort() {
     var self = this;
     this.containerCounter = 1;
+    this.delay = 1000;
+    this.animationDuration = 1000;
 
     this.sort = function(container) {
         var array = container.children();
@@ -88,25 +90,23 @@ function MergeSort() {
             $("#barContainerTop[number='" + self.containerCounter + "']").prepend(left);
             self.containerCounter++;
 
+            setTimeout(function() {
+                barContainer.animate({ 'margin-top' :  70, 'margin-left' : -(array.length/2 * 25) }, self.animationDuration);
+            }, self.delay * self.containerCounter);
+
             var barContainer2 = $('<div></div>').attr({ 'id' : 'barContainerTopRight', 'number' : self.containerCounter });
             barContainer2.insertAfter(barContainer);
             $("#barContainerTopRight[number='" + self.containerCounter + "']").prepend(right);
             self.containerCounter++;
 
             setTimeout(function() {
-                barContainer.animate({ 'margin-top' :  70, 'margin-left' : -(array.length/2 * 25) }, 2000);
-            }, 1000 * self.containerCounter);
-
-            setTimeout(function() {
-                barContainer2.animate({ 'margin-top' : 70, 'margin-right' : -(array.length/2 * 25) }, 2000);
-            }, 1000 * self.containerCounter);
+                barContainer2.animate({ 'margin-top' : 70, 'margin-right' : -(array.length/2 * 25) }, self.animationDuration);
+            }, self.delay * self.containerCounter);
 
             var leftSortedContainer = this.sort(barContainer);
             var rightSortedContainer = this.sort(barContainer2);
-
-            setTimeout(function() {
-                return merge(leftSortedContainer, rightSortedContainer);
-            }, 3000 * self.containerCounter);
+            
+            return merge(leftSortedContainer, rightSortedContainer);
         }
 
         /*
@@ -121,61 +121,81 @@ function MergeSort() {
         */
     };
     merge = function(leftContainer, rightContainer) {
-        console.log(leftContainer);
-        console.log(rightContainer);
         var left = leftContainer.children();
         var right = rightContainer.children();
 
         var newDomArray = $('<div></div>').attr({ 'id' : 'barContainerTop' });
 
-        while (left.length !== 0 && right.length !== 0) {
-            if (parseInt(left[0].innerHTML) <= parseInt(right[0].innerHTML)) {
-                var newLeftContainer = $('<div></div>').attr({ 'id' : 'barContainerTop' });
-                newLeftContainer.prepend($(left[0]).clone());
-                leftContainer.append(newLeftContainer);
-                newLeftContainer.animate({ 'margin-top' : 70, 'margin-left' : (left.length + 1)/2 * 25 }, 2000);
+        var interval0 = setInterval(function() {
+            if (left.length !== 0 && right.length !== 0) {
+                self.containerCounter++;
+                if (parseInt(left[0].innerHTML) <= parseInt(right[0].innerHTML)) {
+                    var newLeftContainer = $('<div></div>').attr({ 'id' : 'barContainerTop' });
+                    newLeftContainer.prepend($(left[0]).clone());
+                    leftContainer.append(newLeftContainer);
+                    
+                    setTimeout(function() {
+                        newLeftContainer.animate({ 'margin-top' : 70, 'margin-left' : (left.length + 2)/2 * 25 }, self.animationDuration);
+                    }, self.delay * self.containerCounter);
 
-                newDomArray.append($(newLeftContainer.clone()));
-                left = self.sliceDomHash(left, 1, left.length);
+                    newDomArray.append($(newLeftContainer).clone());
+                    left = self.sliceDomHash(left, 1, left.length);
+                } else {
+                    var newRightContainer = $('<div></div>').attr({ 'id' : 'barContainerTopRight' });
+                    newRightContainer.prepend($(right[0]).clone());
+                    rightContainer.append(newRightContainer);
+
+                    setTimeout(function() {
+                        newRightContainer.animate({ 'margin-top' : 70, 'margin-right' : 1 + ((left.length + 5)/2 * 25) }, self.animationDuration);
+                    }, self.delay * self.containerCounter);
+
+                    newDomArray.append($(newRightContainer).clone());
+                    right = self.sliceDomHash(right, 1, right.length);
+                }
+
             } else {
-                var newRightContainer = $('<div></div>').attr({ 'id' : 'barContainerTopRight' });
-                newRightContainer.prepend($(right[0]).clone());
-                rightContainer.append(newRightContainer);
-                newRightContainer.animate({ 'margin-top' : 70, 'margin-right' : 2 + ((left.length + 1)/2 * 25) + ((left.length + 2)/2 * 25) }, 2000);
-
-                newDomArray.append($(newRightContainer.clone()));
-                right = self.sliceDomHash(right, 1, right.length);
+                clearInterval(interval0);
             }
-        }
+        });
 
-        setTimeout(function() {
-            while (right.length !== 0) {
+        var interval1 = setInterval(function() {
+            if (right.length === 0) {
+                clearInterval(interval1);
+            } else {
+                self.containerCounter++;
                 var newRightContainer2 = $('<div></div>').attr({ 'id' : 'barContainerTopRight' });
                 newRightContainer2.prepend($(right[0]).clone());
                 rightContainer.append(newRightContainer2);
-                newRightContainer2.animate({ 'margin-top' : 70, 'margin-right' : 2 + (right.length + 1)/2 * 25 }, 2000);
 
-                newDomArray.append($(newRightContainer2.clone()));
+                setTimeout(function() {
+                    newRightContainer2.animate({ 'margin-top' : 70, 'margin-right' : (right.length + 2)/2 * 25 }, self.animationDuration);
+                }, self.delay * self.containerCounter);
+
+                newDomArray.append($(newRightContainer2).clone());
                 right = self.sliceDomHash(right, 1, right.length);
             }
-        }, 2000);
+        });
 
-        setTimeout(function() {
-            while (left.length !== 0) {
+        var interval2 = setInterval(function() {
+            if (left.length === 0) {
+                clearInterval(interval2);
+            } else {
+                self.containerCounter++;
                 var newLeftContainer2 = $('<div></div>').attr({ 'id' : 'barContainerTop' });
                 newLeftContainer2.prepend($(left[0]).clone());
                 leftContainer.append(newLeftContainer2);
-                var marginLeft = 2 + ((right.length + 1)/2 * 25) + (right.length + 2*2)/2 * 25;
-                newLeftContainer2.animate({ 'margin-top' : 70, 'margin-left' : marginLeft  }, 2000);
+                var marginLeft = 3 + ((right.length + 1)/2 * 25 + (right.length + 2*2)/2 * 25);
 
-                newDomArray.append($(newLeftContainer2.clone()));
+                setTimeout(function() {
+                    newLeftContainer2.animate({ 'margin-top' : 70, 'margin-left' : marginLeft }, self.animationDuration);
+                }, self.delay * self.containerCounter);
+
+                newDomArray.append($(newLeftContainer2).clone());
                 left = self.sliceDomHash(left, 1, left.length);
             }
-        }, 2000);
+        });
 
-        console.log("ARRAY:  ");
-        console.log(newDomArray);
-
+        console.log($(newDomArray).text());
         return newDomArray;
         
         /*
